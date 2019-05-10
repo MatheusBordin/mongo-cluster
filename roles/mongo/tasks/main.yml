@@ -1,0 +1,32 @@
+---
+# tasks file for mongo
+- name: Initiate mongo container
+  become: true
+  shell: >-
+    docker run -d \
+      -p {{ port }}:27017 \
+      -v {{ db_path }}:/data/db \
+      -v {{ keyfile_path }}:/opt/mongo-keyfile \
+      --name {{ host }} \
+      --net mongo-cluster \
+      -e "MONGO_INITDB_ROOT_USERNAME={{ root_user }}" \
+      -e "MONGO_INITDB_ROOT_PASSWORD={{ root_pass }}" \
+      mongo:4.0.9 mongod --replSet {{ replica_set_name }} --auth --keyFile /opt/mongo-keyfile
+
+- name: Initiate replicaSet
+  become: true
+  shell: >-
+    sleep 5 && mongo --host "mongodb://{{ root_user }}:{{ root_pass }}@{{ master }}" --eval '
+      rs.initiate( {
+        _id : "{{ replica_set_name }}",
+        members: [
+          { _id: 0, host: "{{ host }}:27017" },
+        ]
+      })'
+  when: is_master
+
+- name: Add member to replicaSet
+  become: true
+  shell: >-
+    sleep 5 && mongo --host "mongodb://{{ root_user }}:{{ root_pass }}@{{ master }}" --eval 'rs.add("{{ host }}:27017")'
+  when: not is_master

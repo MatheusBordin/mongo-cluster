@@ -1,0 +1,11 @@
+---
+# defaults file for mongo
+host: mongo-01
+port: 27017
+is_master: true
+master: mongo-01:27017
+root_user: admin
+root_pass: dracarys
+replica_set_name: terarepl
+db_path: /home/bordin/workspace/tests/docker-mongo/db
+keyfile_path: "{{ role_path }}/files/mongo-keyfile"

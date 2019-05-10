@@ -1,0 +1,32 @@
+---
+- name: Create mongo-01
+  hosts: localhost
+  roles:
+    - role: mongo
+  vars:
+    - port: 30001
+    - master: mongo-01:30001
+    - db_path: /home/bordin/workspace/tests/docker-mongo/db/mongo-01
+
+- name: Create mongo-02
+  hosts: localhost
+  roles:
+    - role: mongo
+  vars:
+    - host: mongo-02
+    - port: 30002
+    - is_master: false
+    - master: mongo-01:30001
+    - db_path: /home/bordin/workspace/tests/docker-mongo/db/mongo-02
+
+- name: Create mongo-03
+  hosts: localhost
+  roles:
+    - role: mongo
+  vars:
+    - host: mongo-03
+    - port: 30003
+    - is_master: false
+    - master: mongo-01:30001
+    - db_path: /home/bordin/workspace/tests/docker-mongo/db/mongo-03
+
